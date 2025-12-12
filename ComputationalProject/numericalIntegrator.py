@@ -8,6 +8,8 @@ we don't duplicate numerical logic across scripts.
 from ComputationalProject.integrator import compute_pendulum_trajectory, save_trajectory_to_csv
 import matplotlib.pyplot as plt
 import argparse
+import os
+from datetime import datetime
 
 
 def main():
@@ -19,6 +21,8 @@ def main():
     parser.add_argument("--periods", type=int, default=50, help="Number of 2*pi periods to simulate")
     parser.add_argument("--save", type=str, default="theta_theta_dot.csv", help="CSV filename to write results")
     parser.add_argument("--plot", action="store_true", help="Show a phase-space plot")
+    parser.add_argument("--outdir", type=str, default="figures", help="Directory to save generated plots")
+    parser.add_argument("--no-save", action="store_true", help="Do not save plots to disk")
 
     args = parser.parse_args()
 
@@ -41,7 +45,19 @@ def main():
         plt.xlabel("Theta (rad)")
         plt.ylabel("Theta_dot (rad/s)")
         plt.grid(True)
-        plt.show()
+        # Save the plot to disk (unless --no-save) and optionally show it
+        if not args.no_save:
+            os.makedirs(args.outdir, exist_ok=True)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            figname = f"phase_{timestamp}.png"
+            figpath = os.path.join(args.outdir, figname)
+            plt.savefig(figpath, dpi=200, bbox_inches="tight")
+            print(f"Saved phase-space figure to {figpath}")
+
+        if args.plot:
+            plt.show()
+        else:
+            plt.close()
 
 
 if __name__ == "__main__":

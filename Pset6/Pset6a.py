@@ -40,4 +40,11 @@ plt.xlabel("Time (s)")
 plt.ylabel("θ (radians)")
 plt.legend()
 plt.grid(True)
-plt.show()
+import os
+
+figdir = os.path.join(os.path.dirname(__file__), "figures")
+os.makedirs(figdir, exist_ok=True)
+figpath = os.path.join(figdir, "Pset6a.png")
+plt.savefig(figpath, dpi=200, bbox_inches='tight')
+print(f"Saved figure to {figpath}")
+plt.close()

@@ -18,3 +18,13 @@ venv/
 
 # VS Code
 .vscode/
+
+# Generated figures and demo GIFs
+figures/
+*.png
+*.jpg
+*.jpeg
+*.gif
+
+# generated CSV example
+theta_theta_dot.csv

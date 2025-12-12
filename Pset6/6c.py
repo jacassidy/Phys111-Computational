@@ -98,4 +98,11 @@ ax.set_ylabel("θ₁")
 ax.legend()
 ax.grid(True)
 
-plt.show()
+import os
+
+figdir = os.path.join(os.path.dirname(__file__), "figures")
+os.makedirs(figdir, exist_ok=True)
+figpath = os.path.join(figdir, "6c.png")
+plt.savefig(figpath, dpi=200, bbox_inches='tight')
+print(f"Saved figure to {figpath}")
+plt.close()

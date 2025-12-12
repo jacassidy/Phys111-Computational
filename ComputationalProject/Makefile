@@ -14,3 +14,6 @@ run-visualizer:
 
 run-save:
 	python3 numericalIntegrator.py --periods 50 --save theta_theta_dot.csv
+
+clean:
+	rm -rf figures

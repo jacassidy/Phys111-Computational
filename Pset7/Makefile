@@ -13,3 +13,6 @@ run-matrix:
 
 run-matrix-sympy:
 	python3 Matrix_sympy.py
+
+clean:
+	rm -rf figures

@@ -21,3 +21,6 @@ run-pset6:
 
 run-pset7:
 	make -C Pset7 run-all
+
+clean:
+	rm -rf figures

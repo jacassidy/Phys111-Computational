@@ -21,3 +21,6 @@ run-partcatt4:
 
 run-pset6a:
 	python3 Pset6a.py
+
+clean:
+	rm -rf figures
