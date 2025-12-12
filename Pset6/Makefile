@@ -1,4 +1,4 @@
-.PHONY: lint format run-all run-6b run-6c run-partcatt4 run-pset6a
+.PHONY: lint format run-all run-6b run-6c run-pset6a
 
 lint:
 	flake8 Pset6
@@ -6,7 +6,7 @@ lint:
 format:
 	black Pset6
 
-run-all: run-6b run-6c run-partcatt4 run-pset6a
+run-all: run-6b run-6c run-pset6a
 
 run-6b:
 	python3 6b.py
@@ -16,8 +16,7 @@ run-6c:
 
 ## archived scripts are not run by default, use them from `archive/` if needed
 
-run-partcatt4:
-	python3 partcatt4.py
+## removed partcatt4 (archived/removed from canonical list)
 
 run-pset6a:
 	python3 Pset6a.py

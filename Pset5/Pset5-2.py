@@ -11,7 +11,7 @@ def g(x):
     return x**2 / (1 + x)
 
 def parta():
-    
+
     # Generate x values over the interval [0, 5]
     x = np.linspace(0, 5, 400)
 
@@ -30,8 +30,14 @@ def parta():
     plt.legend()
     plt.grid(True)
 
-    # Show the plot
-    plt.show()
+    # Save the plot to the 'figures' directory
+    import os
+    figdir = os.path.join(os.path.dirname(__file__), "figures")
+    os.makedirs(figdir, exist_ok=True)
+    figpath = os.path.join(figdir, "parta.png")
+    plt.savefig(figpath, dpi=200, bbox_inches='tight')
+    print(f"Saved figure to {figpath}")
+    plt.close()
 
 
 def partb():
@@ -72,9 +78,24 @@ def partc():
     plt.title(r'Solution of $\ddot{x} + x^2 = t^2$ with $x(0) = 0$, $\dot{x}(0) = 0.5$')
     plt.grid(True)
 
-    # Show the plot
-    plt.show()
+    # Save the plot to the 'figures' directory
+    import os
+    figdir = os.path.join(os.path.dirname(__file__), "figures")
+    os.makedirs(figdir, exist_ok=True)
+    figpath = os.path.join(figdir, "partc.png")
+    plt.savefig(figpath, dpi=200, bbox_inches='tight')
+    print(f"Saved figure to {figpath}")
+    plt.close()
 
-parta()
-partb()
-partc()
+if __name__ == '__main__':
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Run parts of the Pset5 script')
+    parser.add_argument('--part', choices=['a', 'b', 'c', 'all'], default='all', help='Which part to run')
+    args = parser.parse_args()
+    if args.part in ('a', 'all'):
+        parta()
+    if args.part in ('b', 'all'):
+        partb()
+    if args.part in ('c', 'all'):
+        partc()
