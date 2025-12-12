@@ -1,76 +1,48 @@
-import numpy as np
-from scipy.integrate import solve_ivp
+"""Small CLI to compute a pendulum trajectory and optionally plot/save results.
+
+This script keeps the original behavior but calls into the canonical
+`ComputationalProject.integrator.compute_pendulum_trajectory` function so
+we don't duplicate numerical logic across scripts.
+"""
+
+from ComputationalProject.integrator import compute_pendulum_trajectory, save_trajectory_to_csv
 import matplotlib.pyplot as plt
-import csv
-import math
+import argparse
 
-x0 = 1
-omega = 2
 
-theta0 = np.pi                      # x0 = 1 omega = 2 theta dot = 0 barrier = * 3.9626375/5
-theta_dot0 = 2.5
-y0 = [theta0, theta_dot0]
+def main():
+    parser = argparse.ArgumentParser(description="Compute a driven pendulum trajectory and optionally plot/save it.")
+    parser.add_argument("--x0", type=float, default=1.0, help="x0 parameter")
+    parser.add_argument("--omega", type=float, default=2.0, help="omega driving frequency")
+    parser.add_argument("--theta0", type=float, default=3.141592653589793, help="Initial theta")
+    parser.add_argument("--theta_dot0", type=float, default=2.5, help="Initial theta dot")
+    parser.add_argument("--periods", type=int, default=50, help="Number of 2*pi periods to simulate")
+    parser.add_argument("--save", type=str, default="theta_theta_dot.csv", help="CSV filename to write results")
+    parser.add_argument("--plot", action="store_true", help="Show a phase-space plot")
 
-def pendulum_ode(t, y):
-    theta = y[0]
-    theta_dot = y[1]
-    numerator = (
-        np.sin(theta) * (g - theta_dot * omega * x0 * np.cos(t))
-        + omega * x0 * (omega * np.cos(theta) * np.sin(t) + np.cos(t) * np.sin(theta))
+    args = parser.parse_args()
+
+    times, theta_values, theta_dot_values = compute_pendulum_trajectory(
+        x0=args.x0,
+        omega=args.omega,
+        theta0=args.theta0,
+        theta_dot0=args.theta_dot0,
+        N_periods=args.periods,
     )
-    theta_double_dot = numerator / d
-    return [theta_dot, theta_double_dot]
 
-d = 1.0
-g = 9.81
+    save_trajectory_to_csv(args.save, times, theta_values, theta_dot_values)
 
-N_periods = 500
-t_start = 0
-t_end = 2 * np.pi * N_periods
+    print(f"Written {len(times)} points to {args.save}")
 
-n_values = np.arange(0, N_periods + 1)
-t_mark = 2 * np.pi * n_values
-
-sol = solve_ivp(
-    pendulum_ode,
-    [t_start, t_end],
-    y0,
-    t_eval=t_mark,
-    method='RK45',
-    rtol=1e-8,
-    atol=1e-8
-)
-
-theta_values = sol.y[0]
-theta_dot_values = sol.y[1]
-times = sol.t
-
-plt.figure(figsize=(12, 6))
-#np.fmod(theta_values, 2* np.pi)
-plt.scatter(theta_values, theta_dot_values, color='red', zorder=5)
-plt.title(f'Phase-Space: x0 = {x0:.4f}, omega = {omega:.4f}, θ0 = {theta0:.8f}, θ̇0 = {theta_dot0:.4f}')
-plt.xlabel('Theta (rad)')
-plt.ylabel('Theta_dot (rad/s)')
-plt.grid(True)
-plt.show()
-
-print("Theta (rad)\tTheta_dot (rad/s)")
-
-for t, theta, theta_dot in zip(times, theta_values, theta_dot_values):
-    print(f"{theta:.4f}\t\t{theta_dot:.4f}")
-
-    # Specify the filename
-filename = 'theta_theta_dot.csv'
-
-# Write to a CSV file
-with open(filename, mode='w', newline='') as file:
-    writer = csv.writer(file)
-    
-    # Write the header
-    writer.writerow(['Theta', 'Theta Dot'])
-    
-    # Write the data
-    for t, theta, theta_dot in zip(times, theta_values, theta_dot_values):
-        writer.writerow([f"{theta:.4f}", f"{theta_dot:.4f}"])
+    if args.plot:
+        plt.figure(figsize=(10, 6))
+        plt.scatter(theta_values, theta_dot_values, color="red", s=8)
+        plt.title(f"Phase-Space: x0={args.x0}, omega={args.omega}, theta0={args.theta0}, theta_dot0={args.theta_dot0}")
+        plt.xlabel("Theta (rad)")
+        plt.ylabel("Theta_dot (rad/s)")
+        plt.grid(True)
+        plt.show()
 
 
+if __name__ == "__main__":
+    main()

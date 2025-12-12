@@ -1,6 +1,12 @@
-import numpy as np
-from scipy.integrate import solve_ivp
-import matplotlib.pyplot as plt
+"""ARCHIVED: duplicate variant of the double pendulum script.
+
+Use `6c.py` or `partcatt4.py` for canonical simulations. This file is
+kept for reference and will not be run by the Makefile.
+"""
+
+import sys
+print('This is an archived file — original content is copied into Pset6/archive/')
+sys.exit(0)
 
 # Constants
 g = 9.81  # Gravity (m/s^2)
@@ -78,7 +84,7 @@ plt.figure(figsize=(12, 8))
 for y0 in initial_conditions:
     # Integrate the system over the time span [0, 2π]
     sol = solve_ivp(
-        equations, t_span, y0, t_eval=np.linspace(t_span[0], t_span[1], num_points), 
+        equations, t_span, y0, t_eval=np.linspace(t_span[0], t_span[1], num_points),
         dense_output=True
     )
 

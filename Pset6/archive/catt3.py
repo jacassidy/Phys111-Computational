@@ -1,15 +1,12 @@
-"""ARCHIVED: 6catt2.py — alternate implementation of 6c.
+"""Archived variant of catt3.py
 
-This file is archived and not used by the Pset6 Makefile. The canonical
-script for the double pendulum analysis is `6c.py` and `partcatt4.py`.
-
-Kept for reference; prefer `6c.py` for long runs and `partcatt4.py` for
-plotting/phase-space analysis.
+This is an archived copy of the script `Pset6/catt3.py`. The canonical version
+for double pendulum in this folder is `6c.py` and `partcatt4.py`.
 """
 
-import sys
-print('This is an archived file — original content is copied into Pset6/archive/')
-sys.exit(0)
+import numpy as np
+from scipy.integrate import solve_ivp
+import matplotlib.pyplot as plt
 
 # Constants
 g = 9.81  # Gravity (m/s^2)
@@ -31,30 +28,22 @@ def equations(t, y):
     theta1, omega1, theta2, omega2 = y
     delta_theta = theta2 - theta1
 
-    # Equation 1: d(theta1)/d(theta2) = omega1 / omega2
+    # Derivatives of theta1 and theta2
     dtheta1_dt = omega1
     dtheta2_dt = omega2
 
-    # Equation 2: domega1/dtheta2
+    # Derivatives of omega1 and omega2
     domega1_dt = (
         -np.sin(delta_theta) * (omega1**2 * np.cos(delta_theta) + omega2**2)
         - (2 * np.sin(theta1) - np.sin(theta2) * np.cos(delta_theta))
     ) / (omega2 * (1 + np.sin(delta_theta)**2))
 
-    # Equation 3: domega2/dtheta2
     domega2_dt = (
         np.sin(delta_theta) * (omega1**2 + omega2**2 * np.cos(delta_theta))
         + (np.sin(theta1) * np.cos(delta_theta) - 2 * np.sin(theta2))
     ) / (omega2 * (1 + np.sin(delta_theta)**2))
 
     return [dtheta1_dt, domega1_dt, dtheta2_dt, domega2_dt]
-
-# Event function to detect theta2 crossing zero
-def theta2_crossing(t, y):
-    theta2 = y[2]
-    return np.sin(theta2/2)
-theta2_crossing.direction = 1  # Positive crossing only
-theta2_crossing.terminal = False
 
 # Generate initial conditions with H = 1
 def generate_initial_conditions(H_target, num_conditions):
@@ -74,15 +63,17 @@ def generate_initial_conditions(H_target, num_conditions):
         discriminant = B**2 - 4 * A * C
         if discriminant < 0:
             continue
-        omega2 = np.random.choice([(-B + np.sqrt(discriminant)) / (2 * A),
+        else:
+            omega2 = np.random.choice([(-B + np.sqrt(discriminant)) / (2 * A),
                                    (-B - np.sqrt(discriminant)) / (2 * A)])
-        initial_conditions.append([theta1, omega1, theta2, omega2])
+            initial_conditions.append([theta1, omega1, theta2, omega2])
     return initial_conditions
 
 # Parameters
 H_target = 1.0
-num_conditions = 5  # Increase the number of initial conditions
-max_events = 500  # Increase number of points per trajectory
+num_conditions = 5  # Number of initial conditions
+t_span = [0, 2 * np.pi]  # Integrate over one period (2π)
+num_points = 500  # Number of points to sample during the integration
 
 # Generate initial conditions
 initial_conditions = generate_initial_conditions(H_target, num_conditions)
@@ -91,45 +82,27 @@ initial_conditions = generate_initial_conditions(H_target, num_conditions)
 plt.figure(figsize=(12, 8))
 
 for y0 in initial_conditions:
-    t_start = 0
-    t_interval = 50 * 2 * np.pi  # Time interval for each integration step
-    total_events = 0
-    theta_vals = []
-    omega_vals = []
-    y_current = y0.copy()
+    # Integrate the system over the time span [0, 2π]
+    sol = solve_ivp(
+        equations, t_span, y0, t_eval=np.linspace(t_span[0], t_span[1], num_points),
+        dense_output=True
+    )
 
-    while total_events < max_events:
-        t_end = t_start + t_interval
-        sol = solve_ivp(
-            equations, [t_start, t_end], y_current,
-            events=theta2_crossing, dense_output=True
-        )
-        events = sol.y_events[0]
+    # Extract theta1 and omega1 values from the solution
+    theta1_vals = sol.y[0]
+    omega1_vals = sol.y[1]
 
-        if events.size > 0:
-            theta_vals.extend(events[:, 0])
-            omega_vals.extend(events[:, 1])
-            total_events = len(theta_vals)
+    # Plot the results
+    plt.plot(omega1_vals, theta1_vals, lw=0.8, label=f"θ₀={y0[0]:.2f}, ω₀={y0[1]:.2f}")
 
-        # Prepare for next iteration
-        t_start = sol.t[-1]
-        y_current = sol.y[:, -1]
+# Adjust plot limits if needed
+# plt.xlim([-5, 5])
+# plt.ylim([-4 * np.pi, 4 * np.pi])
 
-        # Break if no events are found to prevent infinite loop
-        if events.size == 0:
-            break
-
-    # Limit to 500 points
-    theta_vals = theta_vals[:max_events]
-    omega_vals = omega_vals[:max_events]
-    plt.scatter(omega_vals, theta_vals, s=1, label=f"θ₀={y0[0]}, ω₀={y0[1]}")
-
-# plt.xlim([-20, 20])  # Adjust based on the range of omega values
-# plt.ylim([-4*np.pi, 4*np.pi])  # Adjust based on the range of theta values
-
-plt.title("Surface of Section for Various Initial Conditions")
-plt.xlabel("ω")
-plt.ylabel("θ")
+# Plot labels and grid
+plt.title("Phase Plot of θ₁ vs ω₁ over One Period")
+plt.xlabel("ω₁")
+plt.ylabel("θ₁")
 plt.legend()
 plt.grid(True)
 plt.show()

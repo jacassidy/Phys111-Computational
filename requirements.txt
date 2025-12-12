@@ -1,0 +1,8 @@
+numpy
+scipy
+matplotlib
+pygame
+sympy
+pytest
+flake8
+black

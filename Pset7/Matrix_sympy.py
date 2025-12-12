@@ -1,12 +1,5 @@
-"""ARCHIVED: Matrixatt2.py
-
-This file was an earlier symbolic variant (now mirrored by `Matrix_sympy.py`).
-Keep this file for reference in case of historical analysis; `make` will not run it.
-"""
-
-import sys
-print('This is an archived file — original content is copied into Pset7/archive/')
-sys.exit(0)
+import numpy as np
+import sympy as sp
 
 # Define symbolic variable for w^2
 w2 = sp.symbols('w2')
