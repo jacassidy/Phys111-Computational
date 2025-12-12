@@ -38,6 +38,11 @@ Animate the results (requires a display):
 python ComputationalProject/visualizer.py theta_theta_dot.csv --duration 20
 ```
 
+Note: many scripts now save figures automatically to a `figures/` directory inside
+their folder (e.g. `Pset6/figures/6c.png`). These files are ignored by git; use
+`make -C <folder> run-all` to regenerate and `make -C <folder> clean` to remove
+them.
+
 Running tests and linting
 
 ```bash
